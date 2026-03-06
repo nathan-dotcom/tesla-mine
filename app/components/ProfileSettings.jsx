@@ -41,13 +41,6 @@ function useIsMobile(bp = 768) {
   return m;
 }
 
-const SESSION_HISTORY = [
-  { device: "Chrome on Windows",  location: "Lagos, Nigeria",    ip: "105.112.xxx.xxx", time: "Now", current: true },
-  { device: "Safari on iPhone",   location: "Lagos, Nigeria",    ip: "105.112.xxx.xxx", time: "2 hours ago" },
-  { device: "Chrome on Android",  location: "Abuja, Nigeria",    ip: "41.217.xxx.xxx",  time: "Yesterday" },
-  { device: "Firefox on Windows", location: "London, UK",        ip: "82.132.xxx.xxx",  time: "3 days ago" },
-];
-
 export default function ProfileSettings({ onBack, user, onLogout }) {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("profile");
@@ -76,7 +69,7 @@ export default function ProfileSettings({ onBack, user, onLogout }) {
     setTimeout(() => { setPwSaved(false); setShowPwChange(false); }, 2000);
   }
 
-  const tabs = ["profile", "security", "notifications", "sessions"];
+  const tabs = ["profile", "security", "notifications"];
 
   return (
     <div style={{ minHeight: "100vh", background: "#06090f", fontFamily: "'JetBrains Mono', monospace", color: "#fff", position: "relative", overflow: "hidden" }}>
@@ -135,7 +128,7 @@ export default function ProfileSettings({ onBack, user, onLogout }) {
         <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
           {tabs.map(t => (
             <button key={t} onClick={() => setActiveTab(t)} style={{ padding: "9px 16px", borderRadius: 10, fontSize: 11, fontWeight: 600, fontFamily: "'JetBrains Mono',monospace", transition: "all 0.2s", background: activeTab === t ? "rgba(227,25,55,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${activeTab === t ? "rgba(227,25,55,0.3)" : "rgba(255,255,255,0.06)"}`, color: activeTab === t ? "#e31937" : "#444", textTransform: "capitalize" }}>
-              {{ profile: "👤 Profile", security: "🔐 Security", notifications: "🔔 Notifications", sessions: "🖥 Sessions" }[t]}
+              {{ profile: "👤 Profile", security: "🔐 Security", notifications: "🔔 Notifications" }[t]}
             </button>
           ))}
         </div>
@@ -146,10 +139,10 @@ export default function ProfileSettings({ onBack, user, onLogout }) {
             <div style={{ ...card, padding: 24 }}>
               <div style={{ fontSize: 10, color: "#444", letterSpacing: 2, textTransform: "uppercase", marginBottom: 18 }}>Personal Info</div>
               {[
-                { label: "Full Name",     value: user?.name || "Miner", type: "text" },
-                { label: "Email Address", value: user?.email || "user@example.com", type: "email" },
-                { label: "Phone Number",  value: "+234 000 000 0000", type: "tel" },
-                { label: "Country",       value: "Nigeria", type: "text" },
+                { label: "Full Name",     value: user?.name || "", type: "text" },
+                { label: "Email Address", value: user?.email || "", type: "email" },
+                { label: "Phone Number",  value: "", type: "tel" },
+                { label: "Country",       value: "", type: "text" },
               ].map(({ label, value, type }) => (
                 <div key={label} style={{ marginBottom: 16 }}>
                   <label style={{ fontSize: 10, color: "#444", letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 6 }}>{label}</label>
@@ -300,31 +293,6 @@ export default function ProfileSettings({ onBack, user, onLogout }) {
             ))}
           </div>
         )}
-
-        {/* SESSIONS TAB */}
-        {activeTab === "sessions" && (
-          <div style={{ animation: "fadeIn 0.4s ease" }}>
-            <div style={{ ...card, overflow: "hidden" }}>
-              <div style={{ padding: "16px 22px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ fontSize: 10, color: "#444", letterSpacing: 2, textTransform: "uppercase" }}>Login Sessions</div>
-                <button style={{ fontSize: 11, color: "#ff4455", background: "rgba(255,68,85,0.08)", border: "1px solid rgba(255,68,85,0.2)", padding: "6px 12px", borderRadius: 8, fontFamily: "'JetBrains Mono',monospace" }}>
-                  Revoke All Others
-                </button>
-              </div>
-              {SESSION_HISTORY.map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 22px", borderBottom: "1px solid rgba(255,255,255,0.03)", background: s.current ? "rgba(0,200,150,0.04)" : "transparent" }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: s.current ? "rgba(0,200,150,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${s.current ? "rgba(0,200,150,0.2)" : "rgba(255,255,255,0.06)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                    {s.device.includes("iPhone") || s.device.includes("Android") ? "📱" : "💻"}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: s.current ? "#00c896" : "#ccc", marginBottom: 3 }}>
-                      {s.device} {s.current && <span style={{ fontSize: 9, background: "rgba(0,200,150,0.12)", border: "1px solid rgba(0,200,150,0.25)", padding: "1px 7px", borderRadius: 20, color: "#00c896", marginLeft: 6 }}>CURRENT</span>}
-                    </div>
-                    <div style={{ fontSize: 10, color: "#444" }}>{s.location} · {s.ip} · {s.time}</div>
-                  </div>
-                  {!s.current && (
-                    <button style={{ fontSize: 11, color: "#ff4455", background: "rgba(255,68,85,0.06)", border: "1px solid rgba(255,68,85,0.15)", padding: "5px 11px", borderRadius: 8, fontFamily: "'JetBrains Mono',monospace" }}>Revoke</button>
-                  )}
                 </div>
               ))}
             </div>
