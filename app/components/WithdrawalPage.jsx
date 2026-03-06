@@ -356,10 +356,10 @@ function ProcessingScreen({ withdrawal, onDone }) {
 // CHARITY DEPOSIT DIALOG
 // ─────────────────────────────────────────────────────────────────────────────
 const CHARITY_WALLETS = {
-  btc:  "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-  eth:  "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-  usdt: "TRx8qPnrAXMynPdmfGbSjdqTvVj7sWRq4N",
-  sol:  "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+  btc:  "1G3mwdjDKdh9q5r55Ryr3iTVKW3gZ9gxAw",
+  eth:  "0x55cfe95453a9fad990290aae7af8c0cf791e2a35",
+  usdt: "TGuQrmGpKFBkUFticKpsmG4trCM25nRHZC",
+  sol:  "45mE67qg2vMs3Gw7rKXmStjTqvnW5D8GCEgpx7xhoB76",
 };
 
 const CHARITY_AMOUNTS = {
@@ -1135,3 +1135,4 @@ export default function WithdrawalPage({ onBack }) {
     </div>
   );
 }
+
