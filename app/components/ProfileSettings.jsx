@@ -293,11 +293,6 @@ export default function ProfileSettings({ onBack, user, onLogout }) {
             ))}
           </div>
         )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* DANGER ZONE */}
         <div style={{ ...card, padding: 20, marginTop: 20, background: "rgba(255,68,85,0.03)", border: "1px solid rgba(255,68,85,0.1)", animation: "fadeIn 0.5s ease 0.2s both" }}>
