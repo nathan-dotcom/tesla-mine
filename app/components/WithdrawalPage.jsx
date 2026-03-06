@@ -178,14 +178,14 @@ function LockedScreen({ balance, onBack }) {
       <div style={{ width: "100%", maxWidth: 380, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "24px 22px", marginBottom: 20 }}>
 
         {/* Balance row */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 18 }}>
-          <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 5 }}>Your Balance</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", lineHeight: 1 }}>${balance.toFixed(2)}</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
+          <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "14px 16px" }}>
+            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8 }}>Your Balance</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", lineHeight: 1 }}>${balance.toFixed(2)}</div>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 5 }}>Target</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: "#e31937", fontFamily: "'Syne',sans-serif", lineHeight: 1 }}>${MIN_WITHDRAWAL.toLocaleString()}</div>
+          <div style={{ background: "rgba(227,25,55,0.06)", border: "1px solid rgba(227,25,55,0.15)", borderRadius: 12, padding: "14px 16px" }}>
+            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8 }}>Target</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#e31937", fontFamily: "'Syne',sans-serif", lineHeight: 1 }}>${MIN_WITHDRAWAL.toLocaleString()}</div>
           </div>
         </div>
 
