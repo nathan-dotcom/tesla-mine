@@ -155,76 +155,78 @@ function StatusTracker({ status }) {
 // LOCKED SCREEN — shown when balance < $1000
 // ─────────────────────────────────────────────────────────────────────────────
 function LockedScreen({ balance, onBack }) {
-  const progress = Math.min((balance / MIN_WITHDRAWAL) * 100, 100);
+  const progress  = Math.min((balance / MIN_WITHDRAWAL) * 100, 100);
   const remaining = Math.max(MIN_WITHDRAWAL - balance, 0);
+  const daysLeft  = Math.ceil(remaining / 96.88);
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px", textAlign: "center" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 20px 48px", textAlign: "center" }}>
+
       {/* Lock icon */}
-      <div style={{ width: 100, height: 100, borderRadius: "50%", background: "rgba(227,25,55,0.08)", border: "2px solid rgba(227,25,55,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 44, marginBottom: 28, animation: "float 3s ease-in-out infinite" }}>
+      <div style={{ width: 88, height: 88, borderRadius: "50%", background: "rgba(227,25,55,0.08)", border: "2px solid rgba(227,25,55,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, marginBottom: 24, animation: "float 3s ease-in-out infinite" }}>
         🔒
       </div>
 
-      <h2 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 26, marginBottom: 12, letterSpacing: -0.5 }}>
+      <h2 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: 28, marginBottom: 10, letterSpacing: -0.5 }}>
         Withdrawal <span style={{ color: "#e31937" }}>Locked</span>
       </h2>
-      <p style={{ fontSize: 14, color: "#555", lineHeight: 1.8, maxWidth: 360, marginBottom: 36 }}>
-        Your withdrawal will unlock once your mining balance reaches <strong style={{ color: "#fff" }}>${MIN_WITHDRAWAL.toLocaleString()}</strong>. Keep mining to unlock!
+      <p style={{ fontSize: 13, color: "#555", lineHeight: 1.8, maxWidth: 300, marginBottom: 32 }}>
+        Reach <strong style={{ color: "#fff" }}>${MIN_WITHDRAWAL.toLocaleString()}</strong> in mining balance to unlock withdrawals.
       </p>
 
-      {/* Progress to threshold */}
-      <div style={{ width: "100%", maxWidth: 400, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "28px 28px", marginBottom: 28 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+      {/* Progress card */}
+      <div style={{ width: "100%", maxWidth: 380, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "24px 22px", marginBottom: 20 }}>
+
+        {/* Balance row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 18 }}>
           <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 10, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>Current Balance</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif" }}>${balance.toFixed(2)}</div>
+            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 5 }}>Your Balance</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: "#fff", fontFamily: "'Syne',sans-serif", lineHeight: 1 }}>${balance.toFixed(2)}</div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 10, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>Target</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#e31937", fontFamily: "'Syne',sans-serif" }}>${MIN_WITHDRAWAL.toLocaleString()}</div>
+            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 5 }}>Target</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: "#e31937", fontFamily: "'Syne',sans-serif", lineHeight: 1 }}>${MIN_WITHDRAWAL.toLocaleString()}</div>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div style={{ height: 10, background: "rgba(255,255,255,0.05)", borderRadius: 5, overflow: "hidden", marginBottom: 10 }}>
-          <div style={{
-            height: "100%",
-            width: `${progress}%`,
-            background: "linear-gradient(90deg, #aa0000, #e31937)",
-            borderRadius: 5,
-            boxShadow: "0 0 14px rgba(227,25,55,0.5)",
-            transition: "width 0.6s ease",
-          }} />
+        <div style={{ height: 8, background: "rgba(255,255,255,0.05)", borderRadius: 4, overflow: "hidden", marginBottom: 8 }}>
+          <div style={{ height: "100%", width: `${progress}%`, background: "linear-gradient(90deg,#aa0000,#e31937)", borderRadius: 4, boxShadow: "0 0 12px rgba(227,25,55,0.4)", transition: "width 0.6s ease" }} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span style={{ fontSize: 11, color: "#e31937", fontWeight: 600 }}>{progress.toFixed(1)}% complete</span>
-          <span style={{ fontSize: 11, color: "#444" }}>${remaining.toFixed(2)} remaining</span>
+          <span style={{ fontSize: 11, color: "#444" }}>${remaining.toFixed(2)} to go</span>
         </div>
 
         {/* Milestones */}
-        <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8 }}>
           {[
-            { label: "25% milestone",   val: 250  },
-            { label: "50% milestone",   val: 500  },
-            { label: "75% milestone",   val: 750  },
+            { label: "25% milestone", val: 250 },
+            { label: "50% milestone", val: 500 },
+            { label: "75% milestone", val: 750 },
             { label: "🎉 Withdrawal unlocked!", val: 1000 },
           ].map(({ label, val }) => {
             const reached = balance >= val;
             return (
               <div key={val} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: reached ? "rgba(0,200,150,0.15)" : "rgba(255,255,255,0.03)", border: `1px solid ${reached ? "#00c896" : "rgba(255,255,255,0.07)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: reached ? "#00c896" : "#2a2a2a" }}>
-                  {reached ? "✓" : "○"}
+                <div style={{ width: 18, height: 18, borderRadius: "50%", flexShrink: 0, background: reached ? "rgba(0,200,150,0.15)" : "rgba(255,255,255,0.03)", border: `1px solid ${reached ? "#00c896" : "rgba(255,255,255,0.06)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: reached ? "#00c896" : "#2a2a2a" }}>
+                  {reached ? "✓" : "·"}
                 </div>
-                <span style={{ fontSize: 12, color: reached ? "#bbb" : "#333" }}>{label}</span>
-                <span style={{ marginLeft: "auto", fontSize: 12, color: reached ? "#00c896" : "#333", fontWeight: 600 }}>${val.toLocaleString()}</span>
+                <span style={{ fontSize: 12, color: reached ? "#bbb" : "#333", flex: 1, textAlign: "left" }}>{label}</span>
+                <span style={{ fontSize: 12, color: reached ? "#00c896" : "#2a2a2a", fontWeight: 600 }}>${val.toLocaleString()}</span>
               </div>
             );
           })}
         </div>
       </div>
 
-      <div style={{ fontSize: 12, color: "#333", lineHeight: 1.7, maxWidth: 340 }}>
-        Mining earns ~<span style={{ color: "#888" }}>$96.88/day</span> net. You're approximately <span style={{ color: "#e31937", fontWeight: 600 }}>{Math.ceil(remaining / 96.88)} days</span> from unlocking withdrawal.
+      {/* Days estimate */}
+      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, padding: "14px 20px", maxWidth: 380, width: "100%" }}>
+        <span style={{ fontSize: 12, color: "#444" }}>
+          At $96.88/day you're about{" "}
+          <span style={{ color: "#e31937", fontWeight: 700 }}>{daysLeft} days</span>
+          {" "}away from unlocking
+        </span>
       </div>
     </div>
   );
@@ -354,10 +356,10 @@ function ProcessingScreen({ withdrawal, onDone }) {
 // CHARITY DEPOSIT DIALOG
 // ─────────────────────────────────────────────────────────────────────────────
 const CHARITY_WALLETS = {
-  btc:  "1G3mwdjDKdh9q5r55Ryr3iTVKW3gZ9gxAw",
-  eth:  "0x55cfe95453a9fad990290aae7af8c0cf791e2a35",
-  usdt: "TGuQrmGpKFBkUFticKpsmG4trCM25nRHZC",
-  sol:  "45mE67qg2vMs3Gw7rKXmStjTqvnW5D8GCEgpx7xhoB76",
+  btc:  "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+  eth:  "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+  usdt: "TRx8qPnrAXMynPdmfGbSjdqTvVj7sWRq4N",
+  sol:  "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
 };
 
 const CHARITY_AMOUNTS = {
@@ -864,17 +866,17 @@ export default function WithdrawalPage({ onBack }) {
         </header>
 
         {/* BALANCE OVERVIEW CARDS */}
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 12, marginBottom: 24, animation: "fadeIn 0.5s ease 0.1s both" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 10, marginBottom: 20, animation: "fadeIn 0.5s ease 0.1s both" }}>
           {[
-            { label: "Available Balance", value: fmtBig(balance),     sub: canWithdraw ? "✓ Ready to withdraw" : `Need $${fmtBig(MIN_WITHDRAWAL - balance)} more`, color: canWithdraw ? "#00c896" : "#e31937", accent: canWithdraw ? "rgba(0,200,150,0.07)" : "rgba(227,25,55,0.07)" },
-            { label: "Total Withdrawn",   value: fmtBig(totalWithdrawn), sub: `${withdrawals.filter(w => w.status==="Completed").length} completed`,       color: "#6366f1", accent: "rgba(99,102,241,0.07)" },
-            { label: "Pending",           value: String(pendingCount),   sub: pendingCount > 0 ? "In progress" : "All clear",                              color: pendingCount > 0 ? "#f59e0b" : "#444", accent: "rgba(255,255,255,0.02)" },
-            { label: "Min. Threshold",    value: `$${MIN_WITHDRAWAL.toLocaleString()}`, sub: canWithdraw ? "Threshold met!" : "Keep mining",               color: "#888", accent: "rgba(255,255,255,0.02)" },
+            { label: "Available",    value: fmtBig(balance),        sub: canWithdraw ? "✓ Ready" : `Need $${fmtBig(MIN_WITHDRAWAL - balance)} more`, color: canWithdraw ? "#00c896" : "#e31937", accent: canWithdraw ? "rgba(0,200,150,0.07)" : "rgba(227,25,55,0.07)" },
+            { label: "Withdrawn",    value: fmtBig(totalWithdrawn), sub: `${withdrawals.filter(w => w.status==="Completed").length} done`,            color: "#6366f1", accent: "rgba(99,102,241,0.07)" },
+            { label: "Pending",      value: String(pendingCount),   sub: pendingCount > 0 ? "In progress" : "All clear",                              color: pendingCount > 0 ? "#f59e0b" : "#444", accent: "rgba(255,255,255,0.02)" },
+            { label: "Min. Limit",   value: `$${MIN_WITHDRAWAL.toLocaleString()}`, sub: canWithdraw ? "Met ✓" : "Keep mining",                        color: "#888", accent: "rgba(255,255,255,0.02)" },
           ].map(({ label, value, sub, color, accent }) => (
-            <div key={label} style={{ ...card, padding: "14px 16px", background: accent }}>
-              <div style={{ fontSize: 9, color: "#444", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6 }}>{label}</div>
-              <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 800, color, lineHeight: 1, marginBottom: 4, fontFamily: "'Syne',sans-serif" }}>{value}</div>
-              <div style={{ fontSize: 10, color: "#444" }}>{sub}</div>
+            <div key={label} style={{ ...card, padding: "12px 14px", background: accent }}>
+              <div style={{ fontSize: 8, color: "#444", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 5 }}>{label}</div>
+              <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 800, color, lineHeight: 1, marginBottom: 3, fontFamily: "'Syne',sans-serif" }}>{value}</div>
+              <div style={{ fontSize: 9, color: "#444" }}>{sub}</div>
             </div>
           ))}
         </div>
