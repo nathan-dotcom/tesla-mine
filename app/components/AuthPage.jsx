@@ -8,8 +8,8 @@ import { createClient } from "@supabase/supabase-js";
 // Replace these two values with your project's URL and anon key.
 // Get them from: https://supabase.com/dashboard → your project → Settings → API
 // ─────────────────────────────────────────────────────────────────────────────
-const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL  || "https://YOUR_PROJECT.supabase.co";
-const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "YOUR_ANON_KEY";
+const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL  || "https://gxihfrjvgecfoktatlnc.supabase.co";
+const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_C8s87X99DFrRxMP-xIEG-Q_A-R53eHH";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -903,3 +903,4 @@ export default function AuthPage({ onAuthenticated }) {
 
 // Export helpers for use in dashboard
 export { clearSession, getSession };
+
