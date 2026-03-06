@@ -13,11 +13,11 @@ const TESTIMONIALS = [
   },
   {
     initials: "SK", name: "Sarah K.", location: "London, UK", stars: 5,
-    text: "Super easy to use. I just activate my daily mining session and earnings stack up automatically. Withdrew $2500 last week with zero issues.",
-    tag: "Withdrew $2500 last week",
+    text: "Super easy to use. I just activate my daily mining session and earnings stack up automatically. Withdrew $250 last week with zero issues.",
+    tag: "Withdrew $250 last week",
   },
   {
-    initials: "AO", name: "Amara O.", location: "Ontario, CA", stars: 5,
+    initials: "AO", name: "Amara O.", location: "Lagos, NG", stars: 5,
     text: "Best cloud mining platform I've used. The Tesla energy grid means lower fees and better uptime than any competitor. Highly recommend.",
     tag: "Better than competitors",
   },
@@ -57,7 +57,7 @@ const STATS = [
 const FEATURES = [
   { icon: "⚡", title: "Tesla Energy Powered", desc: "Mining runs on Tesla's surplus renewable energy grid — lower costs, higher uptime, greener footprint." },
   { icon: "🔒", title: "Secure & Transparent", desc: "Real pool fees, real power costs displayed on your dashboard. No hidden charges, ever." },
-  { icon: "💸", title: "Fast Withdrawals", desc: "Withdraw to BTC, ETH, SOL or USDT once you hit the $1000 minimum. Processed within 1–3 hours." },
+  { icon: "💸", title: "Fast Withdrawals", desc: "Withdraw to BTC, ETH, SOL or USDT once you hit the $50 minimum. Processed within 1–3 hours." },
   { icon: "📊", title: "Live Dashboard", desc: "Real-time earnings curve, node hashrate monitoring, temperature gauges and milestone tracking." },
   { icon: "🌍", title: "Global Community", desc: "Join 25,000+ miners from over 80 countries all earning daily from the same trusted platform." },
   { icon: "🛡️", title: "CertiK Audited", desc: "Our smart contracts and payout systems are fully audited by CertiK for maximum security." },
@@ -146,9 +146,9 @@ function LiveCounter() {
 
   return (
     <div style={{
-      display: "flex", alignItems: "center", gap: 8,
+      display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", justifyContent: "center",
       background: "rgba(227,25,55,0.08)", border: "1px solid rgba(227,25,55,0.2)",
-      borderRadius: 50, padding: "8px 18px", marginBottom: 28,
+      borderRadius: 50, padding: "8px 18px", marginBottom: 20,
       backdropFilter: "blur(12px)",
     }}>
       <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#e31937", boxShadow: "0 0 8px #e31937", animation: "pulse 1.5s ease-in-out infinite" }} />
@@ -284,15 +284,14 @@ export default function HomePage({ onStart }) {
           </div>
 
           {/* Headline */}
-          <h1 style={{ ...s(200), fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: isMobile ? "clamp(36px,10vw,52px)" : "clamp(52px,6vw,80px)", lineHeight: 1.05, letterSpacing: -2, marginBottom: 24, maxWidth: 820 }}>
-            Free Bitcoin Mining —<br />
-            <span style={{ color: "#e31937" }}>Start Earning BTC</span><br />
-            Today
+          <h1 style={{ ...s(200), fontFamily: "'Syne', sans-serif", fontWeight: 900, fontSize: isMobile ? "26px" : "clamp(52px,6vw,80px)", lineHeight: isMobile ? 1.25 : 1.05, letterSpacing: isMobile ? 0 : -2, marginBottom: 16, maxWidth: 820 }}>
+            Free Bitcoin Mining —{" "}
+            <span style={{ color: "#e31937" }}>Start Earning BTC Today</span>
           </h1>
 
           {/* Subtext */}
-          <p style={{ ...s(300), fontSize: isMobile ? 15 : 17, color: "#666", lineHeight: 1.8, maxWidth: 560, marginBottom: 40 }}>
-            The easiest way to mine Bitcoin for free. No hardware, no setup — just free BTC mining in the cloud. Join 25,000+ miners earning free bitcoin daily with our cloud mining platform.
+          <p style={{ ...s(300), fontSize: isMobile ? 13 : 17, color: "#666", lineHeight: 1.7, maxWidth: 560, marginBottom: 32 }}>
+            No hardware, no setup — just free BTC mining in the cloud. Join 25,000+ miners earning daily.
           </p>
 
           {/* CTA Buttons */}
@@ -349,7 +348,7 @@ export default function HomePage({ onStart }) {
                   <span style={{ fontSize: 10, color: "#e31937", fontWeight: 600 }}>MINING ACTIVE</span>
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 10, marginBottom: 16 }}>
                 {[
                   { label: "Earnings", value: "$47.2819", color: "#fff" },
                   { label: "Net/Day", value: "$96.88", color: "#00c896" },
@@ -481,7 +480,7 @@ export default function HomePage({ onStart }) {
             {[
               { step: "01", title: "Create Account", desc: "Sign up for free in seconds. No credit card required, no hardware to buy." },
               { step: "02", title: "Activate Mining", desc: "Hit Start Mining on your dashboard. Your nodes begin hashing immediately." },
-              { step: "03", title: "Withdraw Earnings", desc: "Once you hit $1000, withdraw to BTC, ETH, SOL or USDT within hours." },
+              { step: "03", title: "Withdraw Earnings", desc: "Once you hit $50, withdraw to BTC, ETH, SOL or USDT within hours." },
             ].map(({ step, title, desc }, i) => (
               <div key={step} style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 18, padding: "28px 24px", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg,transparent,#e31937,transparent)", opacity: 0.6 }} />
@@ -519,7 +518,7 @@ export default function HomePage({ onStart }) {
               ⚡ Start Free Bitcoin Mining
             </button>
             <div style={{ marginTop: 20, fontSize: 12, color: "#444" }}>
-              Free forever · No setup fees · Withdraw anytime after $1000
+              Free forever · No setup fees · Withdraw anytime after $50
             </div>
           </div>
         </section>
@@ -530,7 +529,7 @@ export default function HomePage({ onStart }) {
             <TeslaLogo size={22} color="#333" />
             <span style={{ fontSize: 11, color: "#2a2a2a", fontWeight: 600 }}>TESLA<span style={{ color: "#4a0a0a" }}>MINE</span></span>
           </div>
-          <span style={{ fontSize: 11, color: "#222" }}>Crypto Mining · Digital System · © 2026 TeslaMine</span>
+          <span style={{ fontSize: 11, color: "#222" }}>Educational Simulation Only · Not financial advice · © 2025 TeslaMine</span>
           <div style={{ display: "flex", gap: 20 }}>
             {["Privacy", "Terms", "Support"].map(l => (
               <span key={l} style={{ fontSize: 11, color: "#2a2a2a", cursor: "pointer" }}>{l}</span>
