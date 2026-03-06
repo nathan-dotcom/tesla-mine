@@ -383,7 +383,13 @@ function RegisterScreen({ onLogin, onSuccess }) {
       });
       if (error) throw error;
       const u = data?.user;
-      onSuccess({ id: u.id, email: u.email, name: u.user_metadata?.name || form.name.trim(), referral: u.user_metadata?.referral || generateRef() });
+      if (!u) throw new Error("Account creation failed. Please try again.");
+      onSuccess({ 
+        id: u.id, 
+        email: u.email, 
+        name: u.user_metadata?.name || form.name.trim(), 
+        referral: u.user_metadata?.referral || generateRef() 
+      });
     } catch (err) {
       setGlobalError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -463,9 +469,8 @@ function LoginScreen({ onRegister, onForgot, onSuccess }) {
         referral: u.user_metadata?.referral || "",
       });
     } catch (err) {
-      // Supabase returns "Email not confirmed" if OTP not yet verified
       if (err.message?.toLowerCase().includes("email not confirmed")) {
-        setGlobalError("Please verify your email first — check your inbox for the 6-digit code.");
+        setGlobalError("Login failed. Please contact support if this persists.");
       } else {
         setGlobalError("Incorrect email or password. Please try again.");
       }
@@ -769,9 +774,7 @@ function ResetPasswordScreen({ email, onSuccess, onBack }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function SuccessScreen({ user, onContinue }) {
   const isMobile = useIsMobile();
-  useEffect(() => {
-    saveSession({ id: user.id, name: user.name, email: user.email, referral: user.referral });
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <AuthLayout isMobile={isMobile} title="" subtitle="">
@@ -835,7 +838,7 @@ export default function AuthPage({ onAuthenticated }) {
     return (
       <RegisterScreen
         onLogin={() => go("login")}
-        onSuccess={(user) => { saveSession(user); onAuthenticated(user); }}
+        onSuccess={(user) => { onAuthenticated(user); }}
       />
     );
   }
