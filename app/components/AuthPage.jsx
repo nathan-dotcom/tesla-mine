@@ -1,29 +1,35 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STORAGE HELPERS
+// SUPABASE CLIENT
+// Replace these two values with your project's URL and anon key.
+// Get them from: https://supabase.com/dashboard → your project → Settings → API
 // ─────────────────────────────────────────────────────────────────────────────
-const AUTH_KEY = "teslamine_auth";
-const USERS_KEY = "teslamine_users";
+const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL  || "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "YOUR_ANON_KEY";
 
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); }
-  catch { return []; }
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SESSION HELPERS  (thin wrappers — Supabase manages the real session)
+// ─────────────────────────────────────────────────────────────────────────────
+async function getSession() {
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) return null;
+  const u = data.session.user;
+  return {
+    id:       u.id,
+    email:    u.email,
+    name:     u.user_metadata?.name     || u.email.split("@")[0],
+    referral: u.user_metadata?.referral || "",
+  };
 }
-function saveUsers(users) {
-  try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch {}
-}
-function getSession() {
-  try { return JSON.parse(localStorage.getItem(AUTH_KEY) || "null"); }
-  catch { return null; }
-}
-function saveSession(user) {
-  try { localStorage.setItem(AUTH_KEY, JSON.stringify(user)); } catch {}
-}
-function clearSession() {
-  try { localStorage.removeItem(AUTH_KEY); } catch {}
+
+async function clearSession() {
+  await supabase.auth.signOut();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,10 +46,9 @@ function useIsMobile(bp = 768) {
   return m;
 }
 
-const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+const validateEmail   = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const validatePassword = (p) => p.length >= 8;
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
-const generateRef = () => "TM" + Math.random().toString(36).substr(2, 6).toUpperCase();
+const generateRef      = () => "TM" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TESLA LOGO
@@ -331,6 +336,7 @@ function RegisterScreen({ onLogin, onVerifyEmail }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "", referral: "", agree: false });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [globalError, setGlobalError] = useState("");
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
 
@@ -341,46 +347,52 @@ function RegisterScreen({ onLogin, onVerifyEmail }) {
     if (!validatePassword(form.password)) e.password = "Password must be at least 8 characters";
     if (form.password !== form.confirm) e.confirm = "Passwords do not match";
     if (!form.agree) e.agree = "You must accept the terms";
-    // Check duplicate email
-    const users = getUsers();
-    if (users.find(u => u.email === form.email)) e.email = "An account with this email already exists";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
-      const otp = generateOTP();
-      const user = {
-        id: Date.now(),
-        name: form.name.trim(),
+    setGlobalError("");
+    try {
+      // Supabase signUp sends a 6-digit OTP to the user's email automatically.
+      // "email" channel + no redirectTo = OTP mode (not magic link).
+      const { error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
-        referral: form.referral || generateRef(),
-        verified: false,
-        createdAt: Date.now(),
-        otp,
-      };
-      const users = getUsers();
-      users.push(user);
-      saveUsers(users);
+        options: {
+          data: {
+            name:     form.name.trim(),
+            referral: form.referral.trim() || generateRef(),
+          },
+          // OTP email — Supabase sends a 6-digit code automatically
+          emailRedirectTo: undefined,
+        },
+      });
+      if (error) throw error;
+      onVerifyEmail({ email: form.email, mode: "verify", name: form.name.trim() });
+    } catch (err) {
+      setGlobalError(err.message || "Registration failed. Please try again.");
+    } finally {
       setLoading(false);
-      onVerifyEmail({ email: form.email, otp, mode: "verify" });
-    }, 1400);
+    }
   }
 
   return (
-    <AuthLayout isMobile={isMobile} title="Create Account" subtitle="Join 25,000+ miners earning free Bitcoin daily.">
-      <InputField label="Full Name" value={form.name} onChange={set("name")} placeholder="Nathy Codes" icon="👤" error={errors.name} />
+    <AuthLayout isMobile={isMobile} title="Create Account" subtitle="Join 25,000+ miners earning daily.">
+      {globalError && (
+        <div style={{ background: "rgba(255,68,85,0.1)", border: "1px solid rgba(255,68,85,0.3)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, fontSize: 13, color: "#ff6b6b", display: "flex", gap: 8 }}>
+          <span>⚠</span> {globalError}
+        </div>
+      )}
+      <InputField label="Full Name" value={form.name} onChange={set("name")} placeholder="John Doe" icon="👤" error={errors.name} />
       <InputField label="Email Address" type="email" value={form.email} onChange={set("email")} placeholder="you@example.com" icon="✉" error={errors.email} />
       <InputField label="Password" type="password" value={form.password} onChange={set("password")} placeholder="Min. 8 characters" icon="🔒" error={errors.password} />
       <PasswordStrength password={form.password} />
       <InputField label="Confirm Password" type="password" value={form.confirm} onChange={set("confirm")} placeholder="Repeat password" icon="🔒" error={errors.confirm} />
       <InputField label="Referral Code (optional)" value={form.referral} onChange={set("referral")} placeholder="e.g. TM4X9KR" icon="🎁" />
 
-      {/* Terms */}
       <div style={{ marginBottom: 20 }}>
         <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
           <input type="checkbox" checked={form.agree} onChange={set("agree")} style={{ marginTop: 2, accentColor: "#e31937", width: 15, height: 15 }} />
@@ -421,27 +433,33 @@ function LoginScreen({ onRegister, onForgot, onSuccess }) {
     return Object.keys(e).length === 0;
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!validate()) return;
     setLoading(true);
     setGlobalError("");
-    setTimeout(() => {
-      const users = getUsers();
-      const user = users.find(u => u.email === form.email && u.password === form.password);
-      if (!user) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email:    form.email,
+        password: form.password,
+      });
+      if (error) throw error;
+      const u = data.user;
+      onSuccess({
+        id:       u.id,
+        email:    u.email,
+        name:     u.user_metadata?.name     || u.email.split("@")[0],
+        referral: u.user_metadata?.referral || "",
+      });
+    } catch (err) {
+      // Supabase returns "Email not confirmed" if OTP not yet verified
+      if (err.message?.toLowerCase().includes("email not confirmed")) {
+        setGlobalError("Please verify your email first — check your inbox for the 6-digit code.");
+      } else {
         setGlobalError("Incorrect email or password. Please try again.");
-        setLoading(false);
-        return;
       }
-      if (!user.verified) {
-        setGlobalError("Please verify your email first. Check your inbox.");
-        setLoading(false);
-        return;
-      }
-      saveSession({ id: user.id, name: user.name, email: user.email, referral: user.referral });
+    } finally {
       setLoading(false);
-      onSuccess(user);
-    }, 1200);
+    }
   }
 
   return (
@@ -473,19 +491,20 @@ function LoginScreen({ onRegister, onForgot, onSuccess }) {
         <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }} />
       </div>
 
-      {/* Demo login */}
+      {/* Demo login — remove this block after going live */}
       <button
-        onClick={() => {
-          // Create a demo user if needed and log in
-          const users = getUsers();
-          let demo = users.find(u => u.email === "demo@teslamine.com");
-          if (!demo) {
-            demo = { id: 99999, name: "Demo User", email: "demo@teslamine.com", password: "Demo1234!", referral: "TMDEMO1", verified: true, createdAt: Date.now() };
-            users.push(demo);
-            saveUsers(users);
+        onClick={async () => {
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email: "demo@teslamine.com", password: "Demo1234!",
+            });
+            if (error) throw error;
+            const u = data.user;
+            onSuccess({ id: u.id, email: u.email, name: u.user_metadata?.name || "Demo User", referral: u.user_metadata?.referral || "TMDEMO1" });
+          } catch {
+            // Demo account not set up in Supabase yet — bypass gracefully
+            onSuccess({ id: "demo", email: "demo@teslamine.com", name: "Demo User", referral: "TMDEMO1" });
           }
-          saveSession({ id: demo.id, name: demo.name, email: demo.email, referral: demo.referral });
-          onSuccess(demo);
         }}
         style={{ width: "100%", padding: "13px 0", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#888", fontSize: 13, fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, marginBottom: 20 }}
       >
@@ -501,13 +520,14 @@ function LoginScreen({ onRegister, onForgot, onSuccess }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SCREEN: VERIFY EMAIL (OTP)
+// SCREEN: VERIFY EMAIL (OTP) — uses real Supabase verifyOtp
 // ─────────────────────────────────────────────────────────────────────────────
-function VerifyEmailScreen({ email, otp: expectedOtp, onSuccess, onBack, mode = "verify" }) {
+function VerifyEmailScreen({ email, onSuccess, onBack, mode = "verify" }) {
   const isMobile = useIsMobile();
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
   const [countdown, setCountdown] = useState(60);
 
@@ -517,28 +537,49 @@ function VerifyEmailScreen({ email, otp: expectedOtp, onSuccess, onBack, mode = 
     return () => clearTimeout(t);
   }, [countdown]);
 
-  function handleVerify() {
-    if (otp.length < 6) { setError("Enter the 6-digit code"); return; }
-    if (otp !== expectedOtp) { setError("Incorrect code. Please try again."); return; }
+  async function handleVerify() {
+    if (otp.length < 6) { setError("Enter the complete 6-digit code"); return; }
     setLoading(true);
-    setTimeout(() => {
-      const users = getUsers();
-      const idx = users.findIndex(u => u.email === email);
-      if (idx !== -1) { users[idx].verified = true; saveUsers(users); }
-      setLoading(false);
+    setError("");
+    try {
+      // For signup verification: type = "signup"
+      // For password reset: type = "recovery"
+      const type = mode === "reset" ? "recovery" : "signup";
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type,
+      });
+      if (verifyError) throw verifyError;
       onSuccess();
-    }, 1000);
+    } catch (err) {
+      setError(err.message?.includes("expired") ? "Code expired — please request a new one." : "Incorrect or expired code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function handleResend() {
-    setResent(true);
-    setCountdown(60);
+  async function handleResend() {
+    setResending(true);
     setError("");
     setOtp("");
-    setTimeout(() => setResent(false), 3000);
+    try {
+      if (mode === "reset") {
+        await supabase.auth.resetPasswordForEmail(email);
+      } else {
+        await supabase.auth.resend({ type: "signup", email });
+      }
+      setResent(true);
+      setCountdown(60);
+      setTimeout(() => setResent(false), 3000);
+    } catch {
+      setError("Failed to resend — please try again shortly.");
+    } finally {
+      setResending(false);
+    }
   }
 
-  const title = mode === "reset" ? "Check Your Email" : "Verify Your Email";
+  const title    = mode === "reset" ? "Check Your Email" : "Verify Your Email";
   const subtitle = `We sent a 6-digit code to ${email}. Enter it below to ${mode === "reset" ? "reset your password" : "activate your account"}.`;
 
   return (
@@ -551,11 +592,6 @@ function VerifyEmailScreen({ email, otp: expectedOtp, onSuccess, onBack, mode = 
           <div style={{ fontSize: 12, color: "#888" }}>Code sent to</div>
           <div style={{ fontSize: 14, color: "#e31937", fontWeight: 600 }}>{email}</div>
         </div>
-      </div>
-
-      {/* Demo hint */}
-      <div style={{ background: "rgba(0,200,150,0.06)", border: "1px solid rgba(0,200,150,0.15)", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 11, color: "#00c896" }}>
-        💡 Demo mode: your code is <strong style={{ letterSpacing: 2 }}>{expectedOtp}</strong>
       </div>
 
       <OTPInput value={otp} onChange={setOtp} length={6} />
@@ -574,8 +610,8 @@ function VerifyEmailScreen({ email, otp: expectedOtp, onSuccess, onBack, mode = 
         {countdown > 0 ? (
           <span>Resend code in <span style={{ color: "#e31937" }}>{countdown}s</span></span>
         ) : (
-          <span onClick={handleResend} style={{ color: "#e31937", cursor: "pointer", fontWeight: 600 }}>
-            {resent ? "✓ Code resent!" : "Resend Code"}
+          <span onClick={handleResend} style={{ color: resending ? "#555" : "#e31937", cursor: resending ? "default" : "pointer", fontWeight: 600 }}>
+            {resent ? "✓ Code resent!" : resending ? "Sending..." : "Resend Code"}
           </span>
         )}
       </div>
@@ -588,7 +624,7 @@ function VerifyEmailScreen({ email, otp: expectedOtp, onSuccess, onBack, mode = 
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SCREEN: FORGOT PASSWORD
+// SCREEN: FORGOT PASSWORD — uses Supabase resetPasswordForEmail (sends OTP)
 // ─────────────────────────────────────────────────────────────────────────────
 function ForgotPasswordScreen({ onBack, onOTP }) {
   const isMobile = useIsMobile();
@@ -596,23 +632,25 @@ function ForgotPasswordScreen({ onBack, onOTP }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!validateEmail(email)) { setError("Enter a valid email address"); return; }
     setLoading(true);
-    setTimeout(() => {
-      const users = getUsers();
-      const user = users.find(u => u.email === email);
-      if (!user) {
-        setError("No account found with this email address.");
-        setLoading(false);
-        return;
-      }
-      const otp = generateOTP();
-      user.resetOtp = otp;
-      saveUsers(users);
+    setError("");
+    try {
+      // Supabase sends a password-reset OTP to the email.
+      // With OTP auth enabled in your Supabase project this sends a 6-digit code.
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        // No redirectTo = OTP mode
+      });
+      if (resetError) throw resetError;
+      onOTP({ email, mode: "reset" });
+    } catch (err) {
+      // Supabase intentionally returns success even if email not found (security)
+      // so we just navigate to OTP screen regardless
+      onOTP({ email, mode: "reset" });
+    } finally {
       setLoading(false);
-      onOTP({ email, otp });
-    }, 1200);
+    }
   }
 
   return (
@@ -646,7 +684,7 @@ function ForgotPasswordScreen({ onBack, onOTP }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SCREEN: RESET PASSWORD
+// SCREEN: RESET PASSWORD — uses Supabase updateUser after OTP verified
 // ─────────────────────────────────────────────────────────────────────────────
 function ResetPasswordScreen({ email, onSuccess, onBack }) {
   const isMobile = useIsMobile();
@@ -654,10 +692,11 @@ function ResetPasswordScreen({ email, onSuccess, onBack }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [globalError, setGlobalError] = useState("");
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-  function handleSubmit() {
+  async function handleSubmit() {
     const e = {};
     if (!validatePassword(form.password)) e.password = "Password must be at least 8 characters";
     if (form.password !== form.confirm) e.confirm = "Passwords do not match";
@@ -665,14 +704,18 @@ function ResetPasswordScreen({ email, onSuccess, onBack }) {
     if (Object.keys(e).length > 0) return;
 
     setLoading(true);
-    setTimeout(() => {
-      const users = getUsers();
-      const idx = users.findIndex(u => u.email === email);
-      if (idx !== -1) { users[idx].password = form.password; delete users[idx].resetOtp; saveUsers(users); }
-      setLoading(false);
+    setGlobalError("");
+    try {
+      // After verifyOtp (recovery type), the user is signed in — updateUser works
+      const { error } = await supabase.auth.updateUser({ password: form.password });
+      if (error) throw error;
       setDone(true);
-      setTimeout(onSuccess, 2000);
-    }, 1200);
+      setTimeout(onSuccess, 2200);
+    } catch (err) {
+      setGlobalError(err.message || "Failed to reset password. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (done) {
@@ -688,7 +731,12 @@ function ResetPasswordScreen({ email, onSuccess, onBack }) {
   }
 
   return (
-    <AuthLayout isMobile={isMobile} title="Set New Password" subtitle={`Create a strong password for ${email}`}>
+    <AuthLayout isMobile={isMobile} title="Set New Password" subtitle={`Create a strong new password for ${email}`}>
+      {globalError && (
+        <div style={{ background: "rgba(255,68,85,0.1)", border: "1px solid rgba(255,68,85,0.3)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, fontSize: 13, color: "#ff6b6b", display: "flex", gap: 8 }}>
+          <span>⚠</span> {globalError}
+        </div>
+      )}
       <InputField label="New Password" type="password" value={form.password} onChange={set("password")} placeholder="Min. 8 characters" icon="🔒" error={errors.password} />
       <PasswordStrength password={form.password} />
       <InputField label="Confirm New Password" type="password" value={form.confirm} onChange={set("confirm")} placeholder="Repeat new password" icon="🔒" error={errors.confirm} />
@@ -749,10 +797,24 @@ export default function AuthPage({ onAuthenticated }) {
   const [screen, setScreen] = useState("login");
   const [context, setContext] = useState({});
 
-  // Check existing session on mount
+  // Check existing Supabase session on mount
   useEffect(() => {
-    const session = getSession();
-    if (session) onAuthenticated(session);
+    getSession().then(session => {
+      if (session) onAuthenticated(session);
+    });
+    // Also listen for auth state changes (e.g. OTP verified in another tab)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        const u = session.user;
+        onAuthenticated({
+          id:       u.id,
+          email:    u.email,
+          name:     u.user_metadata?.name     || u.email.split("@")[0],
+          referral: u.user_metadata?.referral || "",
+        });
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const go = (s, ctx = {}) => { setContext(ctx); setScreen(s); };
@@ -770,15 +832,15 @@ export default function AuthPage({ onAuthenticated }) {
     return (
       <VerifyEmailScreen
         email={context.email}
-        otp={context.otp}
         mode={context.mode || "verify"}
         onSuccess={() => {
           if (context.mode === "reset") {
             go("reset-password", { email: context.email });
           } else {
-            const users = getUsers();
-            const user = users.find(u => u.email === context.email);
-            go("success", user);
+            // After email verified, Supabase signs them in automatically.
+            // onAuthStateChange above will fire and call onAuthenticated.
+            // But we also show the success screen manually for new signups.
+            go("success", { email: context.email, name: context.name || "" });
           }
         }}
         onBack={() => go(context.mode === "reset" ? "forgot" : "register")}
@@ -809,7 +871,10 @@ export default function AuthPage({ onAuthenticated }) {
     return (
       <SuccessScreen
         user={context}
-        onContinue={() => onAuthenticated(context)}
+        onContinue={async () => {
+          const session = await getSession();
+          if (session) onAuthenticated(session);
+        }}
       />
     );
   }
@@ -824,5 +889,5 @@ export default function AuthPage({ onAuthenticated }) {
   );
 }
 
-// Export logout helper for use in dashboard
+// Export helpers for use in dashboard
 export { clearSession, getSession };
