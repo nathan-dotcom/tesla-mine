@@ -13,11 +13,11 @@ const TESTIMONIALS = [
   },
   {
     initials: "SK", name: "Sarah K.", location: "London, UK", stars: 5,
-    text: "Super easy to use. I just activate my daily mining session and earnings stack up automatically. Withdrew $250 last week with zero issues.",
-    tag: "Withdrew $250 last week",
+    text: "Super easy to use. I just activate my daily mining session and earnings stack up automatically. Withdrew $2500 last week with zero issues.",
+    tag: "Withdrew $2500 last week",
   },
   {
-    initials: "AO", name: "Amara O.", location: "Lagos, NG", stars: 5,
+    initials: "AO", name: "Amara O.", location: "Ontario, CA", stars: 5,
     text: "Best cloud mining platform I've used. The Tesla energy grid means lower fees and better uptime than any competitor. Highly recommend.",
     tag: "Better than competitors",
   },
@@ -57,7 +57,7 @@ const STATS = [
 const FEATURES = [
   { icon: "⚡", title: "Tesla Energy Powered", desc: "Mining runs on Tesla's surplus renewable energy grid — lower costs, higher uptime, greener footprint." },
   { icon: "🔒", title: "Secure & Transparent", desc: "Real pool fees, real power costs displayed on your dashboard. No hidden charges, ever." },
-  { icon: "💸", title: "Fast Withdrawals", desc: "Withdraw to BTC, ETH, SOL or USDT once you hit the $50 minimum. Processed within 1–3 hours." },
+  { icon: "💸", title: "Fast Withdrawals", desc: "Withdraw to BTC, ETH, SOL or USDT once you hit the $1000 minimum. Processed within 1–3 hours." },
   { icon: "📊", title: "Live Dashboard", desc: "Real-time earnings curve, node hashrate monitoring, temperature gauges and milestone tracking." },
   { icon: "🌍", title: "Global Community", desc: "Join 25,000+ miners from over 80 countries all earning daily from the same trusted platform." },
   { icon: "🛡️", title: "CertiK Audited", desc: "Our smart contracts and payout systems are fully audited by CertiK for maximum security." },
@@ -518,7 +518,7 @@ export default function HomePage({ onStart }) {
               ⚡ Start Free Bitcoin Mining
             </button>
             <div style={{ marginTop: 20, fontSize: 12, color: "#444" }}>
-              Free forever · No setup fees · Withdraw anytime after $50
+              Free forever · No setup fees · Withdraw anytime after $1000
             </div>
           </div>
         </section>
@@ -529,7 +529,7 @@ export default function HomePage({ onStart }) {
             <TeslaLogo size={22} color="#333" />
             <span style={{ fontSize: 11, color: "#2a2a2a", fontWeight: 600 }}>TESLA<span style={{ color: "#4a0a0a" }}>MINE</span></span>
           </div>
-          <span style={{ fontSize: 11, color: "#222" }}>Educational Simulation Only · Not financial advice · © 2025 TeslaMine</span>
+          <span style={{ fontSize: 11, color: "#222" }}>Crypto Mining · Digital System · © 2026 TeslaMine</span>
           <div style={{ display: "flex", gap: 20 }}>
             {["Privacy", "Terms", "Support"].map(l => (
               <span key={l} style={{ fontSize: 11, color: "#2a2a2a", cursor: "pointer" }}>{l}</span>
@@ -540,3 +540,4 @@ export default function HomePage({ onStart }) {
     </div>
   );
 }
+
