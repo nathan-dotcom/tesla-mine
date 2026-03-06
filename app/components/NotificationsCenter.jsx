@@ -1,22 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const STORAGE_KEY_NOTIFS = "teslamine_notifications";
-
-const INITIAL_NOTIFS = [
-  { id: 1, type: "mining",    title: "Mining Milestone Reached!",     body: "Your balance hit $500 — you're halfway to unlocking withdrawals!", time: Date.now() - 1000 * 60 * 5,  read: false, icon: "⛏" },
-  { id: 2, type: "withdrawal",title: "Withdrawal Pending",             body: "Your withdrawal of $1,200 has been submitted and is being processed. Payment within 24 hours.", time: Date.now() - 1000 * 60 * 40, read: false, icon: "💸" },
-  { id: 3, type: "referral",  title: "New Referral Joined!",           body: "James K. signed up using your referral link. You'll earn 10% of their mining rewards.", time: Date.now() - 1000 * 60 * 120, read: true,  icon: "👥" },
-  { id: 4, type: "security",  title: "New Login Detected",             body: "A new login was detected from Chrome on Windows in Lagos, Nigeria.", time: Date.now() - 1000 * 3600 * 3, read: true,  icon: "🔐" },
-  { id: 5, type: "system",    title: "Platform Maintenance Scheduled", body: "Scheduled maintenance on March 10, 2026 from 02:00–04:00 UTC. Mining will continue uninterrupted.", time: Date.now() - 1000 * 3600 * 24, read: true,  icon: "⚙️" },
-  { id: 6, type: "mining",    title: "Daily Earnings Summary",         body: "Yesterday you earned $96.88 net after fees. Your total mined balance is now $874.32.", time: Date.now() - 1000 * 3600 * 25, read: true,  icon: "📊" },
-  { id: 7, type: "referral",  title: "Referral Bonus Credited",        body: "Sofia R. mined $320 yesterday. Your 10% bonus of $32.00 has been credited to your balance.", time: Date.now() - 1000 * 3600 * 48, read: true,  icon: "💰" },
-];
+const INITIAL_NOTIFS = [];
 
 const TYPE_COLORS = {
   mining:     { color: "#e31937", bg: "rgba(227,25,55,0.08)",    border: "rgba(227,25,55,0.2)"    },
   withdrawal: { color: "#f59e0b", bg: "rgba(245,158,11,0.08)",   border: "rgba(245,158,11,0.2)"   },
-  referral:   { color: "#00c896", bg: "rgba(0,200,150,0.08)",    border: "rgba(0,200,150,0.2)"    },
   security:   { color: "#6366f1", bg: "rgba(99,102,241,0.08)",   border: "rgba(99,102,241,0.2)"   },
   system:     { color: "#888",    bg: "rgba(255,255,255,0.04)",   border: "rgba(255,255,255,0.1)"  },
 };
@@ -123,7 +112,7 @@ export default function NotificationsCenter({ onBack }) {
 
         {/* FILTER PILLS */}
         <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap", animation: "fadeIn 0.4s ease 0.05s both" }}>
-          {["all", "unread", "mining", "withdrawal", "referral", "security", "system"].map(f => (
+          {["all", "unread", "mining", "withdrawal", "security", "system"].map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 11, fontWeight: 600, fontFamily: "'JetBrains Mono',monospace", transition: "all 0.2s", background: filter === f ? "rgba(227,25,55,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${filter === f ? "rgba(227,25,55,0.3)" : "rgba(255,255,255,0.06)"}`, color: filter === f ? "#e31937" : "#444", textTransform: "capitalize" }}>
               {f}{f === "unread" && unreadCount > 0 ? ` (${unreadCount})` : ""}
             </button>
