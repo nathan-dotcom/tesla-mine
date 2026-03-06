@@ -343,7 +343,7 @@ function AuthLayout({ children, title, subtitle, isMobile }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // SCREEN: REGISTER
 // ─────────────────────────────────────────────────────────────────────────────
-function RegisterScreen({ onLogin, onVerifyEmail }) {
+function RegisterScreen({ onLogin, onSuccess }) {
   const isMobile = useIsMobile();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "", referral: "", agree: false });
   const [errors, setErrors] = useState({});
@@ -370,20 +370,20 @@ function RegisterScreen({ onLogin, onVerifyEmail }) {
     try {
       // Supabase signUp sends a 6-digit OTP to the user's email automatically.
       // "email" channel + no redirectTo = OTP mode (not magic link).
-      const { error } = await supabase.auth.signUp({
-        email: form.email,
+      const { data, error } = await supabase.auth.signUp({
+        email: form.email.trim(),
         password: form.password,
         options: {
           data: {
-            name:     form.name.trim(),
-            referral: form.referral.trim() || generateRef(),
+            name: form.name.trim(),
+            referral: generateRef(),
           },
-          // OTP email — Supabase sends a 6-digit code automatically
           emailRedirectTo: undefined,
         },
       });
       if (error) throw error;
-      onVerifyEmail({ email: form.email, mode: "verify", name: form.name.trim() });
+      const u = data?.user;
+      onSuccess({ id: u.id, email: u.email, name: u.user_metadata?.name || form.name.trim(), referral: u.user_metadata?.referral || generateRef() });
     } catch (err) {
       setGlobalError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -835,7 +835,7 @@ export default function AuthPage({ onAuthenticated }) {
     return (
       <RegisterScreen
         onLogin={() => go("login")}
-        onVerifyEmail={(ctx) => go("verify-email", ctx)}
+        onSuccess={(user) => { saveSession(user); onAuthenticated(user); }}
       />
     );
   }
@@ -903,4 +903,3 @@ export default function AuthPage({ onAuthenticated }) {
 
 // Export helpers for use in dashboard
 export { clearSession, getSession };
-
