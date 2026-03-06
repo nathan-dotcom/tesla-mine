@@ -55,10 +55,22 @@ const generateRef      = () => "TM" + Math.random().toString(36).substr(2, 6).to
 // ─────────────────────────────────────────────────────────────────────────────
 function TeslaLogo({ size = 32, color = "#e31937" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 342 342" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="171" cy="171" r="171" fill={color} fillOpacity="0.12" />
-      <path d="M171 68l-13.5 30c8-1.8 18-2.7 13.5-2.7 0 0-4.5.9 13.5 2.7 9 0 19-.9 27-2.7L198 68c-11.7-2.7-15.3-2.7-27 0zM108 83C90 89 67.5 101 54 117c18 1.8 34-1.8 50-10L108 83zM234 83l3.6 24c16 8 32 12 50 10C274 101 251 89 234 83zM171 104c-23 0-54 5.4-72 14.4C108 212 140 256 171 274c31-18 63-62 72-155.6-18-9-49-14.4-72-14.4z" fill={color} />
-    </svg>
+    <img
+      src="/favicon-512.png"
+      alt="Tesla"
+      style={{
+        width: size,
+        height: size,
+        objectFit: "contain",
+        filter: color === "#e31937" || color === "#cc0000" || color === "#aa0000"
+          ? "none"
+          : color === "#222" || color === "#333" || color === "#2a0a0a" || color === "#2a2a2a"
+          ? "brightness(0.15)"
+          : "none",
+        display: "inline-block",
+        flexShrink: 0,
+      }}
+    />
   );
 }
 
@@ -779,7 +791,7 @@ function SuccessScreen({ user, onContinue }) {
           {[
             "🔴 4 mining nodes assigned to your account",
             "⚡ Tesla energy grid connected",
-            "💸 $1000 minimum withdrawal unlocked on first earning",
+            "💸 $50 minimum withdrawal unlocked on first earning",
           ].map(item => (
             <div key={item} style={{ fontSize: 13, color: "#666", marginBottom: 8, textAlign: "left" }}>✓ {item}</div>
           ))}
