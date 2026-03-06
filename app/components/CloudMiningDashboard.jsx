@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import WithdrawalPage from "./WithdrawalPage";
-import ReferralPage from "./ReferralPage";
+
 import EarningsCalculator from "./EarningsCalculator";
 import ProfileSettings from "./ProfileSettings";
 import NotificationsCenter from "./NotificationsCenter";
@@ -425,9 +425,7 @@ export default function CloudMiningDashboard({ user, onLogout }) {
   if (page === "withdraw") {
     return <WithdrawalPage onBack={() => setPage("dashboard")} />;
   }
-  if (page === "referral") {
-    return <ReferralPage onBack={() => setPage("dashboard")} user={user} />;
-  }
+
   if (page === "calculator") {
     return <EarningsCalculator onBack={() => setPage("dashboard")} onInvest={({ planId, amount }) => { setInvestInit({ planId, amount }); setPage("invest"); }} />;
   }
@@ -528,7 +526,7 @@ export default function CloudMiningDashboard({ user, onLogout }) {
                   {[
                     { icon: "📊", label: "Calculator", page: "calculator" },
                     { icon: "💹", label: "Invest",     page: "invest" },
-                    { icon: "👥", label: "Refer",      page: "referral" },
+
                     { icon: "🎧", label: "Support",    page: "support" },
                   ].map(({ icon, label, page: p }) => (
                     <button key={p} onClick={() => setPage(p)} style={{ padding: "7px 12px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "#555", fontSize: 11, fontFamily: "'JetBrains Mono',monospace", display: "flex", alignItems: "center", gap: 5, transition: "all 0.2s" }}
@@ -585,10 +583,8 @@ export default function CloudMiningDashboard({ user, onLogout }) {
                       { icon: "🔔", label: "Notifications",      action: () => { setPage("notifications"); setShowUserMenu(false); } },
                       { icon: "💸", label: "Withdraw",           action: () => { setPage("withdraw"); setShowUserMenu(false); } },
                       { icon: "💹", label: "Invest / Upgrade",   action: () => { setPage("invest"); setShowUserMenu(false); } },
-                      { icon: "👥", label: "Referrals",          action: () => { setPage("referral"); setShowUserMenu(false); } },
                       { icon: "📊", label: "Earnings Calc",      action: () => { setPage("calculator"); setShowUserMenu(false); } },
                       { icon: "🎧", label: "Support",            action: () => { setPage("support"); setShowUserMenu(false); } },
-                      { icon: "🏷", label: `Ref: ${user?.referral || "—"}`, action: null },
                     ].map(({ icon, label, action }) => (
                       <button key={label} onClick={action} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, background: "none", border: "none", color: action ? "#ccc" : "#444", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", textAlign: "left", display: "flex", alignItems: "center", gap: 8, cursor: action ? "pointer" : "default" }}
                         onMouseEnter={e => action && (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
@@ -719,9 +715,9 @@ export default function CloudMiningDashboard({ user, onLogout }) {
         <div style={{ marginTop: 24, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.03)", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", gap: 4 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <TeslaLogo size={13} color="#222" />
-            <span style={{ fontSize: 10, color: "#1e1e1e" }}>Tesla Energy Mining Platform · Digital Systems</span>
+            <span style={{ fontSize: 10, color: "#1e1e1e" }}>Tesla Energy Mining Platform · Sponsored by Elon Musk</span>
           </div>
-          <span style={{ fontSize: 10, color: "#1e1e1e" }}>Crypto Mining · Digital System · © 2026 TeslaMine</span>
+          <span style={{ fontSize: 10, color: "#1e1e1e" }}>Crypto Mining · Digital System · Decentralised Coin</span>
         </div>
       </div>
 
@@ -732,7 +728,6 @@ export default function CloudMiningDashboard({ user, onLogout }) {
             { icon: "⛏",  label: "Mine",       p: "dashboard" },
             { icon: "💹", label: "Invest",     p: "invest" },
             { icon: "💸", label: "Withdraw",   p: "withdraw" },
-            { icon: "👥", label: "Refer",      p: "referral" },
             { icon: "👤", label: "Profile",    p: "profile" },
           ].map(({ icon, label, p }) => (
             <button key={p} onClick={() => setPage(p)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "none", border: "none", color: page === p ? "#e31937" : "#444", fontSize: 10, fontFamily: "'JetBrains Mono',monospace", cursor: "pointer" }}>
