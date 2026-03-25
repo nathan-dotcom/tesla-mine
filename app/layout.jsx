@@ -26,7 +26,8 @@ export default function RootLayout({ children }) {
         <link rel="icon"             type="image/png"    sizes="48x48"   href="/favicon-48.png" />
         <link rel="apple-touch-icon" type="image/png"    sizes="180x180" href="/apple-touch-icon.png" />
       </head>
-      <body style={{ margin: 0, padding: 0, background: "#06090f" }}>
+      <body suppressHydrationWarning
+      style={{ margin: 0, padding: 0, background: "#06090f" }}>
         {children}
       </body>
     </html>

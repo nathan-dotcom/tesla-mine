@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { loadProfile, getAllProfiles, REQUIRED_FIELDS } from "./ProfileCompletionGate";
 
 function TeslaLogo({ size = 32, color = "#e31937" }) {
   return (
@@ -138,19 +139,34 @@ export default function ProfileSettings({ onBack, user, onLogout }) {
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, animation: "fadeIn 0.4s ease" }}>
             <div style={{ ...card, padding: 24 }}>
               <div style={{ fontSize: 10, color: "#444", letterSpacing: 2, textTransform: "uppercase", marginBottom: 18 }}>Personal Info</div>
-              {[
-                { label: "Full Name",     value: user?.name || "", type: "text" },
-                { label: "Email Address", value: user?.email || "", type: "email" },
-                { label: "Phone Number",  value: "", type: "tel" },
-                { label: "Country",       value: "", type: "text" },
-              ].map(({ label, value, type }) => (
-                <div key={label} style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 10, color: "#444", letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 6 }}>{label}</label>
-                  <input defaultValue={value} type={type} style={{ width: "100%", padding: "11px 14px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#ccc", fontSize: 12, fontFamily: "'JetBrains Mono',monospace" }} />
-                </div>
-              ))}
+              {(() => {
+                const profile = loadProfile(user?.id);
+                const fields = [
+                  { label: "First Name",       value: profile?.firstName    || user?.name?.split(" ")[0] || "" },
+                  { label: "Last Name",        value: profile?.lastName     || user?.name?.split(" ")[1] || "" },
+                  { label: "Email Address",    value: profile?.email        || user?.email || "" },
+                  { label: "Phone Number",     value: profile?.phone        || "" },
+                  { label: "Street Number",    value: profile?.streetNumber || "" },
+                  { label: "Street Name",      value: profile?.streetName   || "" },
+                  { label: "City / Town",      value: profile?.city         || "" },
+                  { label: "Country",          value: profile?.country      || "" },
+                  { label: "Post Code",        value: profile?.postCode     || "" },
+                  { label: "Country / Region", value: profile?.region       || "" },
+                ];
+                return fields.map(({ label, value }) => (
+                  <div key={label} style={{ marginBottom: 14 }}>
+                    <label style={{ fontSize: 10, color: "#444", letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 6 }}>{label}</label>
+                    <input defaultValue={value} readOnly style={{ width: "100%", padding: "11px 14px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", color: "#888", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", cursor: "default" }} />
+                  </div>
+                ));
+              })()}
+              <div style={{ background: "rgba(227,25,55,0.06)", border: "1px solid rgba(227,25,55,0.15)", borderRadius: 10, padding: "11px 14px", marginBottom: 14 }}>
+                <div style={{ fontSize: 10, color: "#e31937", marginBottom: 4 }}>REFERRAL CODE</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "#e31937", letterSpacing: 4, fontFamily: "'Syne',sans-serif" }}>{user?.referral || "N/A"}</div>
+                <div style={{ fontSize: 10, color: "#555", marginTop: 4 }}>Share this code — earn $5 per successful referral</div>
+              </div>
               <button onClick={handleSave} style={{ width: "100%", padding: "12px 0", borderRadius: 11, background: saved ? "rgba(0,200,150,0.15)" : "linear-gradient(135deg,#aa0000,#e31937)", border: saved ? "1px solid rgba(0,200,150,0.3)" : "none", color: saved ? "#00c896" : "#fff", fontWeight: 700, fontSize: 13, fontFamily: "'JetBrains Mono',monospace", transition: "all 0.2s" }}>
-                {saved ? "✓ Saved!" : "Save Changes"}
+                {saved ? "✓ Saved!" : "Update Profile"}
               </button>
             </div>
 

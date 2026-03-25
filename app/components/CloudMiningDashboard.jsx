@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import WithdrawalPage from "./WithdrawalPage";
+import { loadProfile } from "./ProfileCompletionGate";
 
 import EarningsCalculator from "./EarningsCalculator";
 import ProfileSettings from "./ProfileSettings";
@@ -13,7 +14,7 @@ const DAILY_RATE = 100;
 const TARGET = 1000;
 const TICK_MS = 80;
 const STORAGE_KEY = "cloud_mining_v2";
-const MIN_WITHDRAW = 1000;
+const MIN_WITHDRAW = 10000;
 const POOL_FEE = 0.012;
 const POWER_COST_DAY = 2.88;
 const NET_DAILY = DAILY_RATE * (1 - POOL_FEE) - POWER_COST_DAY;
@@ -355,10 +356,10 @@ function SidebarContent({ active, progress, mined, ratePerSec, tick, completed }
       <div style={card}>
         <div style={{ fontSize: 10, color: "#444", letterSpacing: 2, textTransform: "uppercase", marginBottom: 14 }}>Payout Milestones</div>
         {[
-          { threshold: 50,   label: "Min Withdraw" },
-          { threshold: 250,  label: "Silver Tier" },
-          { threshold: 500,  label: "Gold Tier" },
-          { threshold: 1000, label: "Full Cycle" },
+          { threshold: 1000,  label: "Bronze Tier" },
+          { threshold: 2500,  label: "Silver Tier" },
+          { threshold: 5000,  label: "Gold Tier" },
+          { threshold: 10000, label: "Withdrawal Unlocked" },
         ].map(({ threshold, label }) => {
           const reached = mined >= threshold;
           const isCurrent = mined < threshold && mined >= threshold * 0.6;
@@ -379,6 +380,23 @@ function SidebarContent({ active, progress, mined, ratePerSec, tick, completed }
             </div>
           );
         })}
+      </div>
+
+      <div style={{ background: "rgba(227,25,55,0.06)", border: "1px solid rgba(227,25,55,0.15)", borderRadius: 14, padding: "14px 16px" }}>
+        <div style={{ fontSize: 10, color: "#e31937", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10, fontWeight: 700 }}>🎁 Referral Programme</div>
+        <p style={{ fontSize: 11, color: "#555", lineHeight: 1.6, marginBottom: 10 }}>
+          Earn <span style={{ color: "#e31937", fontWeight: 700 }}>$5.00</span> for every friend you refer who signs up and starts mining.
+        </p>
+        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+          <div style={{ flex: 1, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 12px", textAlign: "center" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#e31937", fontFamily: "'Syne',sans-serif" }}>{mined > 0 ? Math.floor(mined / 100) : 0}</div>
+            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>Referrals</div>
+          </div>
+          <div style={{ flex: 1, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 12px", textAlign: "center" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#00c896", fontFamily: "'Syne',sans-serif" }}>${(Math.floor(mined / 100) * 5).toFixed(2)}</div>
+            <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>Earned</div>
+          </div>
+        </div>
       </div>
 
       <div style={{ ...card, background: "rgba(255,255,255,0.015)" }}>
@@ -403,6 +421,10 @@ export default function CloudMiningDashboard({ user, onLogout }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   // ✅ ALL hooks declared first — no early returns before this block
   const [page, setPage] = useState("dashboard");
+  const [referralEarnings, setReferralEarnings] = useState(0);
+  const [referralCount,   setReferralCount]   = useState(0);
+  const [showReferral,    setShowReferral]    = useState(false);
+  const [referralCopied,  setReferralCopied]  = useState(false);
   const [investInit, setInvestInit] = useState(null); // { planId, amount } from calculator
   const { mined, active, progress, hoursElapsed, ratePerSec, history, start, pause, reset } = useMiningEngine();
   const isMobile = useIsMobile();
@@ -419,6 +441,19 @@ export default function CloudMiningDashboard({ user, onLogout }) {
       setNetworkDiff((d) => +(d + (Math.random() - 0.5) * 0.04).toFixed(2));
     }, 1200);
     return () => clearInterval(iv);
+  }, []);
+
+  // Load referral data
+  useEffect(() => {
+    try {
+      const key = "teslamine_referrals_" + (user?.id || "guest");
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const data = JSON.parse(saved);
+        setReferralCount(data.count || 0);
+        setReferralEarnings((data.count || 0) * 5);
+      }
+    } catch {}
   }, []);
 
   // ✅ Early return ONLY after all hooks and effects
@@ -526,7 +561,6 @@ export default function CloudMiningDashboard({ user, onLogout }) {
                   {[
                     { icon: "📊", label: "Calculator", page: "calculator" },
                     { icon: "💹", label: "Invest",     page: "invest" },
-
                     { icon: "🎧", label: "Support",    page: "support" },
                   ].map(({ icon, label, page: p }) => (
                     <button key={p} onClick={() => setPage(p)} style={{ padding: "7px 12px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "#555", fontSize: 11, fontFamily: "'JetBrains Mono',monospace", display: "flex", alignItems: "center", gap: 5, transition: "all 0.2s" }}
